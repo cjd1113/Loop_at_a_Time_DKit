@@ -26,6 +26,11 @@ Lines 145 -- 166 are where I define an uncertain interconnection stiffness eleme
 # UncertainStiffnessRange
 This is the function that I wrote that parameterizes the Young's modulus of the stiffness element as existing within some interval range (real, parametric, norm-bounded uncertainty).  On line 165, I create a Matlab data structure which makes carrying these parameters around cleaner.  
 
-Now we can bring your attention to lines 167 to 231.  This is where generalized plants are again formed by connecting the two beam models through the uncertain stiffness element.  Control design is also performed.  Scenarios 1 and 2 are carried out, here.  We will detail the loop formulations, as I wrote a function for flexibly handling this task, given that I was dealing with high-dimensional system models that possess a fair bit of meaning/complexity.
+Now we can bring your attention to lines 167 to 231.  This is where generalized plants are again formed by connecting the two beam models through the uncertain stiffness element.  Control design is also performed.  Scenarios 1 and 2 are carried out, here.  We will detail the loop formulations, as I wrote a function for flexibly handling this task, given that I was dealing with high-dimensional system models that possess a fair bit of meaning/complexity.  Let us now detail the loopformulations.m function, which is first called on line 206.
+
+# loopformulations.m
+The output of this function is a structure, which is a new, uncertain generalied plant model.  This generalized plant model is our "design model", as it is passed to another function for performing controller synthesis.  Two systems, two controllers (if provided), the uncertain coupling subsystem, and the loop formulation scenario are provided as inputs.  Note that most of these inputs are provided as Matlab structures.  Hence, you will see them get unpacked at the header of this function.  Depending upon the scenario that is called, a new generalized plant is formed.  These scenarios are detailed in chapter 6 of my dissertation.
+
+
 
 
