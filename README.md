@@ -23,7 +23,7 @@ Observe that the generalized plant models (on lines 60 and 142) are packed into 
 
 Lines 145 -- 166 are where I define an uncertain interconnection stiffness element.  This uncertain stiffness element will exist as a subsystem and is used to join the two beam models that were created previously.
 
-# UncertainStiffnessRange
+# UncertainStiffnessRange.m
 This is the function that I wrote that parameterizes the Young's modulus of the stiffness element as existing within some interval range (real, parametric, norm-bounded uncertainty).  On line 165, I create a Matlab data structure which makes carrying these parameters around cleaner.  
 
 Now we can bring your attention to lines 167 to 231.  This is where generalized plants are again formed by connecting the two beam models through the uncertain stiffness element.  Control design is also performed.  Scenarios 1 and 2 are carried out, here.  We will detail the loop formulations, as I wrote a function for flexibly handling this task, given that I was dealing with high-dimensional system models that possess a fair bit of meaning/complexity.  Let us now detail the loopformulations.m function, which is first called on line 206.
@@ -32,6 +32,11 @@ Now we can bring your attention to lines 167 to 231.  This is where generalized 
 The output of this function is a structure, which is a new, uncertain generalied plant model.  This generalized plant model is our "design model", as it is passed to another function for performing controller synthesis.  Two systems, two controllers (if provided), the uncertain coupling subsystem, and the loop formulation scenario are provided as inputs.  Note that most of these inputs are provided as Matlab structures.  Hence, you will see them get unpacked at the header of this function.  Depending upon the scenario that is called, a new generalized plant is formed.  These scenarios are detailed in chapter 6 of my dissertation.
 
 We now return to the main invoking script, loopatatimeDKItfiltered.m.  
+
+I perform controller design in a global coordinate system by frequency weighting the performance output functions of the global system.  This is done on lines 214--225 and again on lines 284--295.  Therein, I invoke another function that I wrote called filterfunctions.m.
+
+# filterfunctions.m
+Here, I use information about the lightly-damped resonances of the system in order to extract the magnitude of smooth filter functions at particular frequency locations.  I wrote the function such that the user can define smooth filters of varying slope (after the cutoff frequency); the magnitude at each coincident system natural frequency is then extracted for use in the main function, loopatatimeDKItfiltered.m. Let us return to that main script.
 
 Controller synthesis, which is performed using mu synthesis via D/K iterations, is called on line 235.  Note that one decentralized controller (if it exists) will be synthesized at this step.  Then, we move into Scenario 2, which attempts to close the loop around an already-closed loop.  This is why this is called "loop at a time" synthesis.  The process is repeated, and if successful, we end up with two decentralized robust controllers.  By repeated, I mean that we are moving into a new loop formulation scenario followed by mu synthesis via D/K iterations for controller synthesis.  The dksyn command is one that is internal to Matlab, and is a part of the robust control toolbox.  I could have written my own code to accomplish this, but that would not have been efficient: I have detailed all of the relevant theory in my dissertation, though, and how I end up exploiting the conservatism and sub-optimality of this powerful, elegent control synthesis approach in order to advance the state of the art in synthesis of decentralized, probabilistic robust dynamic output feedback controllers.  
 
